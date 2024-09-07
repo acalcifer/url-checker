@@ -8,20 +8,21 @@ import java.net.URI
 class UrlCheckService {
     fun isUrlExist(urlString: String): Boolean {
         try {
-            var parsedUrlString = urlString
-            if (!parsedUrlString.contains("http")) {
-                val sb = StringBuilder()
-                sb.append("http://").append(parsedUrlString)
-                parsedUrlString = sb.toString()
+            var formattedUrl = urlString
+            if (!formattedUrl.startsWith("http://") && !formattedUrl.startsWith("https://")) {
+                formattedUrl = "http://$formattedUrl"
             }
-            val url = URI(parsedUrlString).toURL()
-            val connection = url.openConnection() as HttpURLConnection
-            connection.requestMethod = "HEAD"
-            connection.connectTimeout = 3000
-            connection.readTimeout = 3000
-            connection.connect()
-            return true
-        } catch (err: Error) {
+
+            val uri = URI(formattedUrl)
+            val url = uri.toURL()
+
+            with(url.openConnection() as HttpURLConnection) {
+                requestMethod = "HEAD"
+                connectTimeout = 5000
+                readTimeout = 5000
+                return responseCode in 200..399
+            }
+        } catch (_e: Exception) {
             return false
         }
     }
