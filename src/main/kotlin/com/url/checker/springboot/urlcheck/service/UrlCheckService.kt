@@ -1,11 +1,17 @@
 package com.url.checker.springboot.urlcheck.service
 
+import com.url.checker.springboot.urlcheck.model.UrlCheckResult
+import com.url.checker.springboot.urlcheck.repository.UrlCheckResultRepository
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.net.HttpURLConnection
 import java.net.URI
+import java.time.LocalDateTime
 
 @Service
-class UrlCheckService {
+class UrlCheckService @Autowired constructor(
+    private val urlCheckResultRepository: UrlCheckResultRepository
+) {
     fun isUrlExist(urlString: String): Boolean {
         try {
             var formattedUrl = urlString
@@ -25,5 +31,19 @@ class UrlCheckService {
         } catch (_e: Exception) {
             return false
         }
+    }
+
+    fun checkUrlAndSave(urlString: String): Boolean {
+        val isReachable = isUrlExist(urlString)
+
+        // Save the result to the database
+        val urlStatus = UrlCheckResult(
+            url = urlString,
+            isReachable = isReachable,
+            checkedAt = LocalDateTime.now()
+        )
+        urlCheckResultRepository.save(urlStatus)
+        
+        return isReachable
     }
 }

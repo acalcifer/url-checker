@@ -1,5 +1,6 @@
 package com.url.checker.springboot.urlcheck.controller
 
+import com.url.checker.springboot.urlcheck.model.UrlCheckRequest
 import com.url.checker.springboot.urlcheck.service.UrlCheckService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -19,7 +20,7 @@ class UrlCheckController(@Autowired val urlCheckService: UrlCheckService) {
         ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
 
     @PostMapping("/check-url")
-    fun checkUrl(@RequestBody urlString: String): Boolean {
-        return urlCheckService.isUrlExist(urlString)
+    fun checkUrl(@RequestBody urlCheckRequest: UrlCheckRequest): Boolean {
+        return urlCheckService.checkUrlAndSave(urlCheckRequest.url)
     }
 }
