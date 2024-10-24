@@ -11,7 +11,7 @@ import java.util.UUID
 @Entity
 data class UrlCheckResult(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID = UUID.randomUUID(),
 
     @Column(nullable = false)
