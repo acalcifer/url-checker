@@ -5,22 +5,22 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Column
-import jakarta.persistence.Table
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Entity
 data class UrlCheckResult(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: UUID = UUID.randomUUID(),
 
     @Column(nullable = false)
     val url: String,
 
-    @Column(name = "is_reachable", nullable = false)
+    @Column(nullable = false)
     val isReachable: Boolean,
 
-    @Column(name = "checked_at", nullable = false)
+    @Column(nullable = false)
     val checkedAt: LocalDateTime = LocalDateTime.now()
 )
 

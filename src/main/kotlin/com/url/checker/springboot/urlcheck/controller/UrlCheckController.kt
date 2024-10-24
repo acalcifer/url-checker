@@ -2,14 +2,13 @@ package com.url.checker.springboot.urlcheck.controller
 
 import com.url.checker.springboot.urlcheck.model.UrlCheckRequest
 import com.url.checker.springboot.urlcheck.service.UrlCheckService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api")
-class UrlCheckController(@Autowired val urlCheckService: UrlCheckService) {
+class UrlCheckController(private val urlCheckService: UrlCheckService) {
 
     @ExceptionHandler(NoSuchElementException::class)
     fun handleNotFound(e: NoSuchElementException): ResponseEntity<String> =

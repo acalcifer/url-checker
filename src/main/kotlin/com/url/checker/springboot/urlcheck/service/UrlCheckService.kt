@@ -2,16 +2,21 @@ package com.url.checker.springboot.urlcheck.service
 
 import com.url.checker.springboot.urlcheck.model.UrlCheckResult
 import com.url.checker.springboot.urlcheck.repository.UrlCheckResultRepository
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.net.HttpURLConnection
 import java.net.URI
-import java.time.LocalDateTime
+import java.time.LocalDateTime.now
 
 @Service
-class UrlCheckService @Autowired constructor(
+class UrlCheckService constructor(
     private val urlCheckResultRepository: UrlCheckResultRepository
 ) {
+    companion object {
+        private const val REQUEST_HEAD = "HEAD"
+        private const val CONNECTION_TIMEOUT = 5000
+        private const val READ_TIMEOUT = 5000
+    }
+
     fun isUrlExist(urlString: String): Boolean {
         try {
             var formattedUrl = urlString
@@ -19,13 +24,12 @@ class UrlCheckService @Autowired constructor(
                 formattedUrl = "http://$formattedUrl"
             }
 
-            val uri = URI(formattedUrl)
-            val url = uri.toURL()
+            val url = URI(formattedUrl).toURL()
 
             with(url.openConnection() as HttpURLConnection) {
-                requestMethod = "HEAD"
-                connectTimeout = 5000
-                readTimeout = 5000
+                requestMethod = REQUEST_HEAD
+                connectTimeout = CONNECTION_TIMEOUT
+                readTimeout = READ_TIMEOUT
                 return responseCode in 200..399
             }
         } catch (_e: Exception) {
@@ -40,10 +44,10 @@ class UrlCheckService @Autowired constructor(
         val urlStatus = UrlCheckResult(
             url = urlString,
             isReachable = isReachable,
-            checkedAt = LocalDateTime.now()
+            checkedAt = now()
         )
         urlCheckResultRepository.save(urlStatus)
-        
+
         return isReachable
     }
 }
