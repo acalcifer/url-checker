@@ -27,6 +27,13 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
+  quartz:
+    job-store-type: memory
+    scheduler-name: UrlCheckQuartzScheduler
+
   logging:
+    level:
+      root: INFO
+      com.url.checker.springboot.urlcheck: DEBUG
     file:
       name: logs/url-check-kotlin.log

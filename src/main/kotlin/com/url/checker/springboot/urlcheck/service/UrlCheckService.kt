@@ -2,6 +2,8 @@ package com.url.checker.springboot.urlcheck.service
 
 import com.url.checker.springboot.urlcheck.model.UrlCheckResult
 import com.url.checker.springboot.urlcheck.repository.UrlCheckResultRepository
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 import org.springframework.stereotype.Service
 import java.net.HttpURLConnection
 import java.net.URI
@@ -11,13 +13,15 @@ import java.time.LocalDateTime.now
 class UrlCheckService constructor(
     private val urlCheckResultRepository: UrlCheckResultRepository
 ) {
+    private val logger: Logger = LogManager.getLogger(this.javaClass)
+
     companion object {
         private const val REQUEST_HEAD = "HEAD"
         private const val CONNECTION_TIMEOUT = 5000
         private const val READ_TIMEOUT = 5000
     }
 
-    fun checkUrlWithProtocol(urlWithProtocol: String): Boolean {
+    private fun checkUrlWithProtocol(urlWithProtocol: String): Boolean {
         try {
             val url = URI(urlWithProtocol).toURL()
 
@@ -32,7 +36,7 @@ class UrlCheckService constructor(
         }
     }
 
-    fun isUrlExist(urlString: String): Boolean {
+    private fun isUrlExist(urlString: String): Boolean {
         try {
             var formattedUrl = urlString
             if (!formattedUrl.startsWith("http://") && !formattedUrl.startsWith("https://")) {
@@ -45,14 +49,17 @@ class UrlCheckService constructor(
         }
     }
 
-    fun checkUrlAndSave(urlString: String): Boolean {
-        val foundedUrl = urlCheckResultRepository.findByUrl(urlString)
-        if (foundedUrl.isPresent) {
-            return foundedUrl.get().isReachable
+    fun checkUrlAndSave(urlString: String, skipCheckForJobs: Boolean = false): Boolean {
+        logger.info("ski is $skipCheckForJobs")
+        if (!skipCheckForJobs) {
+            val foundedUrl = urlCheckResultRepository.findByUrl(urlString)
+            logger.info("foundedUrl $foundedUrl")
+            if (foundedUrl.isPresent) {
+                return foundedUrl.get().isReachable
+            }
         }
         val isReachable = isUrlExist(urlString)
 
-        // Save the result to the database
         val urlStatus = UrlCheckResult(
             url = urlString,
             isReachable = isReachable,
