@@ -17,27 +17,39 @@ class UrlCheckService constructor(
         private const val READ_TIMEOUT = 5000
     }
 
-    fun isUrlExist(urlString: String): Boolean {
+    fun checkUrlWithProtocol(urlWithProtocol: String): Boolean {
         try {
-            var formattedUrl = urlString
-            if (!formattedUrl.startsWith("http://") && !formattedUrl.startsWith("https://")) {
-                formattedUrl = "http://$formattedUrl"
-            }
+            val url = URI(urlWithProtocol).toURL()
 
-            val url = URI(formattedUrl).toURL()
-
-            with(url.openConnection() as HttpURLConnection) {
+            return with(url.openConnection() as HttpURLConnection) {
                 requestMethod = REQUEST_HEAD
                 connectTimeout = CONNECTION_TIMEOUT
                 readTimeout = READ_TIMEOUT
                 return responseCode in 200..399
             }
-        } catch (_e: Exception) {
+        } catch (_: Exception) {
+            return false
+        }
+    }
+
+    fun isUrlExist(urlString: String): Boolean {
+        try {
+            var formattedUrl = urlString
+            if (!formattedUrl.startsWith("http://") && !formattedUrl.startsWith("https://")) {
+                formattedUrl = "https://$formattedUrl"
+            }
+            return checkUrlWithProtocol(formattedUrl) || checkUrlWithProtocol("http://$formattedUrl")
+
+        } catch (_: Exception) {
             return false
         }
     }
 
     fun checkUrlAndSave(urlString: String): Boolean {
+        val foundedUrl = urlCheckResultRepository.findByUrl(urlString)
+        if (foundedUrl.isPresent) {
+            return foundedUrl.get().isReachable
+        }
         val isReachable = isUrlExist(urlString)
 
         // Save the result to the database
