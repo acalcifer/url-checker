@@ -45,13 +45,12 @@ class UrlCheckService(
         }
     }
 
-    fun checkUrlAndSave(urlString: String, skipCheckForJobs: Boolean = false): Boolean {
-        if (!skipCheckForJobs) {
-            val foundedUrl = urlCheckResultRepository.findByUrl(urlString)
-            if (foundedUrl.isPresent) {
-                return foundedUrl.get().isReachable
-            }
+    fun checkUrlAndSave(urlString: String): Boolean {
+        val foundedUrl = urlCheckResultRepository.findByUrl(urlString)
+        if (foundedUrl.isPresent) {
+            return foundedUrl.get().isReachable
         }
+
         val isReachable = isUrlExist(urlString)
 
         val urlStatus = UrlCheckResult(
