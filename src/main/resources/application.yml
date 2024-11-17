@@ -35,5 +35,6 @@ spring:
     level:
       root: INFO
       com.url.checker.springboot.urlcheck: DEBUG
+      org.springframework.cache: DEBUG
     file:
       name: logs/url-check-kotlin.log

@@ -2,6 +2,7 @@ package com.url.checker.springboot.urlcheck.service
 
 import com.url.checker.springboot.urlcheck.model.UrlCheckResult
 import com.url.checker.springboot.urlcheck.repository.UrlCheckResultRepository
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import java.net.HttpURLConnection
 import java.net.URI
@@ -45,6 +46,7 @@ class UrlCheckService(
         }
     }
 
+    @Cacheable("urlExistenceCache", key = "#urlString")
     fun checkUrlAndSave(urlString: String): Boolean {
         val foundedUrl = urlCheckResultRepository.findByUrl(urlString)
         if (foundedUrl.isPresent) {

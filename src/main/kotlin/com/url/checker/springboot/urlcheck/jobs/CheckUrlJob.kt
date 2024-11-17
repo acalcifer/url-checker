@@ -25,6 +25,7 @@ class CheckUrlJob : Job {
             val isReachable = urlCheckService.isUrlExist(urlRecord.url)
             urlRecord.copy(isReachable = isReachable, checkedAt = now())
         }
+        logger.info("job context $context")
         logger.info("updated records by quartz job $updatedUrlRecords")
 
         urlCheckResultRepository.saveAll(updatedUrlRecords)
